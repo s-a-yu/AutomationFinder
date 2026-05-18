@@ -1,0 +1,37 @@
+{
+  "value_weights": {
+    "frequency": 0.25,
+    "volume": 0.20,
+    "rule_clarity": 0.25,
+    "error_cost": 0.15,
+    "input_consistency": 0.15
+  },
+  "readiness_weights": {
+    "data_availability": 0.30,
+    "process_maturity": 0.25,
+    "tooling": 0.25,
+    "risk_compliance": 0.20
+  },
+  "effort_modifiers": {
+    "S": 1.15,
+    "M": 1.0,
+    "L": 0.80
+  },
+  "risk_penalty": {
+    "low": 0,
+    "medium": 0.05,
+    "high": 0.15
+  },
+  "risk_tolerance_map": {
+    "conservative": "low",
+    "moderate": "medium",
+    "aggressive": "high"
+  },
+  "tier_thresholds": {
+    "quick_win": { "priority_min": 0.65, "readiness_min": 0.55 },
+    "plan_now": { "priority_min": 0.45 },
+    "backlog": {}
+  },
+  "score_max": 3,
+  "score_min": 1
+}

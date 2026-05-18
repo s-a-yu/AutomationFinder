@@ -1,0 +1,211 @@
+ACME Corp — Cloud FinOps Operations Runbook
+Version 2.3 | Last updated: Q1 2025
+Owner: Cloud Infrastructure & Finance Team
+
+================================================================================
+OVERVIEW
+================================================================================
+
+This document describes ACME Corp's current cloud financial operations processes
+for AWS and GCP environments. Our annual cloud spend is approximately $4.2M. The
+FinOps team consists of 3 full-time engineers and 1 part-time finance analyst.
+We operate under SOC 2 Type II compliance and have strict change-management
+requirements for any automated resource modifications.
+
+================================================================================
+1. COST ALLOCATION & TAGGING
+================================================================================
+
+We run cost allocation every Monday morning. A Python script pulls the AWS Cost
+and Usage Report (CUR) from S3, applies our tagging taxonomy, and loads the
+results into BigQuery for downstream dashboards.
+
+Current state: Roughly 68% of our spend is correctly tagged. The remaining 32%
+sits in a "shared services" bucket that finance manually splits each month using
+a spreadsheet. This manual split takes about 6 hours per month and is error-prone
+— we had two incorrect chargebacks in Q3 2024 that required credits.
+
+Tag enforcement is done via AWS Config rules but violations are only reported,
+not auto-remediated. Tagging taxonomy is fully documented and rule-based (team,
+env, project, cost-center). Inputs come consistently from our Terraform modules
+and a manual tagging guide for console-created resources.
+
+Volume: ~2,400 resources tagged per week across 14 AWS accounts and 6 GCP projects.
+
+================================================================================
+2. SPEND ANOMALY DETECTION
+================================================================================
+
+We have a basic anomaly detection setup using AWS Cost Anomaly Monitor. Alerts
+fire to a Slack channel when spend exceeds 20% over a 3-day rolling average.
+
+The problem: we get roughly 40–60 alerts per week, many of which are false
+positives from scheduled batch jobs, end-of-month reporting runs, or planned
+infrastructure scaling. The on-call engineer triages these manually each morning,
+which takes 45–60 minutes. True anomalies are caught but often 24–36 hours late.
+
+We have no GCP-side anomaly detection beyond manual weekly review of the billing
+console. Rules for what constitutes a true anomaly vs. expected variance are
+partially documented but rely heavily on engineer judgment.
+
+================================================================================
+3. RESOURCE RIGHTSIZING
+================================================================================
+
+Rightsizing recommendations come from AWS Compute Optimizer and a custom GCP
+script that runs monthly. A FinOps engineer reviews the list, removes instances
+flagged as "do not resize" (maintained in a spreadsheet), and emails recommended
+changes to the relevant service team.
+
+Implementation is entirely manual — service teams apply changes on their own
+schedule (or not at all). Roughly 35% of recommendations are acted on within 60
+days. We estimate $280K/year in rightsizing savings are currently unrealized.
+
+This process is high risk because applying an incorrect resize to a production
+database or high-traffic API can cause outages. All production changes require
+a change ticket and 48-hour review window. Non-prod changes are more flexible.
+
+Volume: 80–120 rightsizing candidates generated per monthly run.
+
+================================================================================
+4. BUDGET ALERTING
+================================================================================
+
+Budget alerts are configured in AWS Budgets for 12 teams and in GCP Billing
+for 6 projects. Thresholds are set at 80% and 100% of monthly budget. Alerts
+go to team leads via email and to a shared Slack channel.
+
+Rules are completely clear and consistent — if spend hits a threshold, the alert
+fires. This is fully automated already, but alert routing is inconsistent: some
+teams have updated their distribution lists, others haven't since 2023. We
+manually verify alert routing quarterly.
+
+We do not have forecasted-spend alerts (only actuals), which means teams sometimes
+hit 100% mid-month with no warning until the alert fires.
+
+Volume: ~30 budget alerts monitored. Alert configuration updates happen ~10x/month
+as teams and budgets change.
+
+================================================================================
+5. IDLE RESOURCE CLEANUP
+================================================================================
+
+We run an idle resource scan weekly using a combination of AWS Trusted Advisor,
+a custom Lambda, and manual GCP console review. Output is a CSV report emailed
+to the FinOps team every Friday.
+
+Idle resources identified: unattached EBS volumes, stopped EC2 instances > 7 days,
+unused Elastic IPs, and GCP persistent disks with no attachment in 30 days.
+
+Decommissioning is entirely manual. The FinOps engineer contacts the resource
+owner (identified via tags when available), waits 5 business days for a response,
+then submits a change ticket to delete if no response. This process takes 2–3 hours
+per week just for coordination. We frequently lose track of follow-up threads.
+
+Risk is moderate — deleting the wrong volume or snapshot could cause data loss.
+We take a final snapshot before deletion but this adds cost and manual steps.
+
+Volume: 30–80 idle resources identified per weekly scan. ~20% are actually deleted.
+
+================================================================================
+6. SHOWBACK & CHARGEBACK
+================================================================================
+
+Monthly chargeback reports are generated on the 3rd business day of each month.
+A finance analyst exports cost data from BigQuery, applies business unit split
+rules (documented in a shared Google Doc), and generates per-team PDFs using a
+Google Sheets template. Reports are emailed manually to 14 team leads.
+
+The split rules are deterministic once the tagging data is clean, but the current
+68% tagging coverage means the analyst spends significant time making judgment
+calls on untagged spend allocation. This introduces inconsistency month-to-month.
+
+We have received complaints from 3 team leads in the past 6 months about charges
+they couldn't reconcile. Two required manual corrections after-the-fact.
+
+Internal billing transfers to accounting are done via a separate manual journal
+entry process in NetSuite.
+
+================================================================================
+7. INVOICE RECONCILIATION
+================================================================================
+
+AWS consolidated billing invoice arrives on the 1st of each month. The finance
+analyst compares the invoice total against our internal BigQuery cost data.
+Discrepancies above $500 are investigated.
+
+Common discrepancy sources: credits not reflected in CUR, marketplace charges
+showing up late, and support plan charges. Resolution typically requires opening
+an AWS support case, which adds 3–10 business days.
+
+Volume: 1 invoice per month (AWS), 1 per month (GCP). Discrepancies occur in
+roughly 3 out of 4 months and average $1,200 to resolve.
+
+Process is mostly rule-based: compare line items, identify delta, categorize cause,
+escalate if over threshold. Main judgment call is deciding when a discrepancy is
+worth escalating vs. writing off.
+
+================================================================================
+8. COST FORECASTING
+================================================================================
+
+Quarterly forecasting is done by the finance analyst in a Google Sheets model.
+Inputs: last 6 months of actual spend by service, headcount projections from HR,
+planned infrastructure changes from the roadmap doc. Output: 3-scenario forecast
+(base, upside, downside) submitted to CFO each quarter.
+
+This is a largely manual, judgment-heavy process. The analyst has good intuition
+for seasonal patterns but the model has no statistical backing. Forecast accuracy
+last year was ±22% at the quarterly level, which finance considers unacceptable.
+
+We have no automated forecasting tool. Inputs are inconsistently formatted across
+quarters — the roadmap doc changes owners frequently and the format is unstable.
+
+================================================================================
+9. COMMITMENT MANAGEMENT
+================================================================================
+
+We hold approximately $1.1M in AWS Reserved Instances (1-year, partial upfront)
+and $200K in GCP committed use discounts. Renewals are tracked in a spreadsheet
+maintained by one FinOps engineer.
+
+Current RI utilization: 81%. Idle RIs represent approximately $18K/month in waste.
+No automated coverage analysis runs — this is done manually once per quarter ahead
+of renewal windows.
+
+Purchasing new commitments requires CFO sign-off and a 2-week procurement process.
+Given the financial exposure and compliance requirements, this process will remain
+largely manual but analysis and recommendation generation could be automated.
+
+================================================================================
+10. UNIT ECONOMICS REPORTING
+================================================================================
+
+We track cost-per-active-user and cost-per-API-call for our two primary product
+lines. These metrics are computed monthly by joining cloud cost data with product
+analytics data (Mixpanel export) in a Python notebook.
+
+The notebook runs manually — there is no scheduler. The FinOps engineer runs it
+when requested, usually ahead of board meetings or investor updates. It is not
+consistently run month-over-month.
+
+The join logic is complex: cost must be attributed to specific product features
+across shared infrastructure, which requires allocation keys that are manually
+maintained. Inputs are inconsistent — Mixpanel export format has changed twice
+in the past year.
+
+================================================================================
+OPEN ISSUES & KNOWN PAIN POINTS
+================================================================================
+
+- Tagging coverage at 68% is below our 90% target. No enforcement automation.
+- Anomaly alert fatigue causing genuine issues to be missed or delayed.
+- Rightsizing savings unrealized due to manual implementation bottleneck.
+- Chargeback accuracy disputes consuming finance analyst time each month.
+- No GCP-equivalent of our AWS tooling — significant manual gap.
+- Single point of failure: most processes depend on one FinOps engineer.
+- No unified FinOps platform — processes span 6 different tools.
+
+================================================================================
+END OF DOCUMENT
+================================================================================

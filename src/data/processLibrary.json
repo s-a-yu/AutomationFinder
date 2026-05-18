@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cost_allocation",
+    "label": "Cost Allocation & Tagging",
+    "description": "Assigning cloud spend to teams, projects, or cost centers via tags and account hierarchies.",
+    "risk_level": "low",
+    "effort": "M"
+  },
+  {
+    "id": "anomaly_detection",
+    "label": "Spend Anomaly Detection",
+    "description": "Identifying unexpected cost spikes or drops relative to historical baselines.",
+    "risk_level": "low",
+    "effort": "M"
+  },
+  {
+    "id": "rightsizing",
+    "label": "Resource Rightsizing",
+    "description": "Recommending or applying instance/service size changes to reduce over-provisioning.",
+    "risk_level": "medium",
+    "effort": "L"
+  },
+  {
+    "id": "commitment_mgmt",
+    "label": "Commitment Management",
+    "description": "Purchasing and tracking Reserved Instances, Savings Plans, or committed-use discounts.",
+    "risk_level": "high",
+    "effort": "L"
+  },
+  {
+    "id": "showback_chargeback",
+    "label": "Showback & Chargeback",
+    "description": "Generating per-team cost reports and processing internal billing transfers.",
+    "risk_level": "low",
+    "effort": "M"
+  },
+  {
+    "id": "budget_alerting",
+    "label": "Budget Alerting",
+    "description": "Monitoring spend against budgets and triggering alerts or escalations on thresholds.",
+    "risk_level": "low",
+    "effort": "S"
+  },
+  {
+    "id": "idle_resource",
+    "label": "Idle Resource Cleanup",
+    "description": "Detecting and decommissioning unused instances, volumes, snapshots, and IPs.",
+    "risk_level": "medium",
+    "effort": "M"
+  },
+  {
+    "id": "forecast",
+    "label": "Cost Forecasting",
+    "description": "Projecting future cloud spend by service, team, or project for planning cycles.",
+    "risk_level": "low",
+    "effort": "M"
+  },
+  {
+    "id": "invoice_reconciliation",
+    "label": "Invoice Reconciliation",
+    "description": "Matching cloud provider invoices against internal cost data and resolving discrepancies.",
+    "risk_level": "medium",
+    "effort": "S"
+  },
+  {
+    "id": "unit_economics",
+    "label": "Unit Economics Reporting",
+    "description": "Computing cost-per-transaction, cost-per-customer, or other business-unit metrics.",
+    "risk_level": "low",
+    "effort": "L"
+  },
+  {
+    "id": "policy_enforcement",
+    "label": "Policy Enforcement",
+    "description": "Automatically detecting and remediating non-compliant resources (e.g., oversized, untagged).",
+    "risk_level": "high",
+    "effort": "L"
+  },
+  {
+    "id": "vendor_negotiation",
+    "label": "Vendor Negotiation Support",
+    "description": "Compiling usage data, benchmarks, and contract analysis to support cloud discount negotiations.",
+    "risk_level": "low",
+    "effort": "L"
+  }
+]
