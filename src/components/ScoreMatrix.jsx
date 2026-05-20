@@ -28,9 +28,9 @@ export default function ScoreMatrix({ results }) {
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full border border-gray-200 rounded-xl bg-white">
         {/* quadrant shading */}
         <rect x={PAD} y={PAD} width={(W - PAD * 2) / 2} height={(H - PAD * 2) / 2} fill="#fef3c7" opacity="0.5" />
-        <rect x={(W + PAD * 2) / 2} y={PAD} width={(W - PAD * 2) / 2} height={(H - PAD * 2) / 2} fill="#d1fae5" opacity="0.5" />
-        <rect x={PAD} y={(H + PAD * 2) / 2} width={(W - PAD * 2) / 2} height={(H - PAD * 2) / 2} fill="#fee2e2" opacity="0.4" />
-        <rect x={(W + PAD * 2) / 2} y={(H + PAD * 2) / 2} width={(W - PAD * 2) / 2} height={(H - PAD * 2) / 2} fill="#ede9fe" opacity="0.5" />
+        <rect x={W / 2} y={PAD} width={(W - PAD * 2) / 2} height={(H - PAD * 2) / 2} fill="#d1fae5" opacity="0.5" />
+        <rect x={PAD} y={H / 2} width={(W - PAD * 2) / 2} height={(H - PAD * 2) / 2} fill="#fee2e2" opacity="0.4" />
+        <rect x={W / 2} y={H / 2} width={(W - PAD * 2) / 2} height={(H - PAD * 2) / 2} fill="#ede9fe" opacity="0.5" />
 
         {/* axes */}
         <line x1={PAD} y1={PAD} x2={PAD} y2={H - PAD} stroke="#d1d5db" strokeWidth="1.5" />
@@ -44,9 +44,9 @@ export default function ScoreMatrix({ results }) {
 
         {/* quadrant labels */}
         <text x={PAD + 8} y={PAD + 16} fontSize="10" fill="#92400e" fontFamily="sans-serif">Low readiness</text>
-        <text x={(W + PAD * 2) / 2 + 8} y={PAD + 16} fontSize="10" fill="#065f46" fontFamily="sans-serif">Quick Wins</text>
+        <text x={W / 2 + 8} y={PAD + 16} fontSize="10" fill="#065f46" fontFamily="sans-serif">Quick Wins</text>
         <text x={PAD + 8} y={H / 2 + 24} fontSize="10" fill="#991b1b" fontFamily="sans-serif">Avoid / Revisit</text>
-        <text x={(W + PAD * 2) / 2 + 8} y={H / 2 + 24} fontSize="10" fill="#4338ca" fontFamily="sans-serif">Plan Now</text>
+        <text x={W / 2 + 8} y={H / 2 + 24} fontSize="10" fill="#4338ca" fontFamily="sans-serif">Plan Now</text>
 
         {/* points */}
         {results.map((r, i) => {

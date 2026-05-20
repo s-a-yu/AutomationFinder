@@ -45,8 +45,8 @@ export default function RoadmapTable({ results }) {
                   <tr key={r.processId} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 pr-4 text-gray-400 font-medium">{i + 1}</td>
                     <td className="py-3 pr-4 font-semibold text-gray-800">{r.label}</td>
-                    <td className="py-3 pr-4">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${EFFORT_BADGE[r.effort].cls}`}>
+                    <td className="py-3 pr-4 whitespace-nowrap">
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${EFFORT_BADGE[r.effort].cls}`}>
                         {EFFORT_BADGE[r.effort].label}
                       </span>
                     </td>

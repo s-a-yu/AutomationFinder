@@ -58,19 +58,75 @@ async function callGroq(prompt, timeoutMs = 20000, retries = 2) {
 export async function generateSummary(scoredResults, orgContext) {
   const prompt = `You are a FinOps consulting expert. Based on the following assessment data, produce a JSON executive summary.
 
-Org context: ${JSON.stringify(orgContext)}
+Org context (includes existing tools, cloud providers, and platforms the client already uses):
+${JSON.stringify(orgContext)}
 
 Scored processes (sorted by priority): ${JSON.stringify(scoredResults)}
 
 Return ONLY valid JSON with this exact shape:
 {
   "executive_summary": "2-3 sentence paragraph",
-  "quick_wins": [{"process": "label", "rationale": "one sentence", "effort": "S|M|L"}],
-  "plan_now": [{"process": "label", "rationale": "one sentence", "effort": "S|M|L"}],
+  "quick_wins": [{
+    "process": "label",
+    "rationale": "one sentence",
+    "effort": "S|M|L",
+    "industry_standards": [
+      "Relevant FinOps Foundation framework capability or industry best practice for this specific process"
+    ],
+    "recommended_tools": [
+      {
+        "name": "Tool or platform name",
+        "license": "Open Source|Commercial|Freemium",
+        "notes": "One sentence on why it fits this process and the client's stack"
+      }
+    ],
+    "cost_estimate": {
+      "implementation": "$X,000–$X,000 one-time",
+      "licensing": "$X/month or Free/Open Source",
+      "notes": "One sentence of cost context based on org size and effort"
+    },
+    "action_steps": [
+      {"phase": "Phase 1: Discovery & Design", "duration": "1-2 weeks", "tasks": ["task", "task", "task"]},
+      {"phase": "Phase 2: Build & Test", "duration": "2-3 weeks", "tasks": ["task", "task", "task"]},
+      {"phase": "Phase 3: Deploy & Monitor", "duration": "1 week", "tasks": ["task", "task"]}
+    ],
+    "success_metrics": ["metric", "metric"]
+  }],
+  "plan_now": [{
+    "process": "label",
+    "rationale": "one sentence",
+    "effort": "S|M|L",
+    "industry_standards": [
+      "Relevant FinOps Foundation framework capability or industry best practice for this specific process"
+    ],
+    "recommended_tools": [
+      {
+        "name": "Tool or platform name",
+        "license": "Open Source|Commercial|Freemium",
+        "notes": "One sentence on why it fits this process and the client's stack"
+      }
+    ],
+    "cost_estimate": {
+      "implementation": "$X,000–$X,000 one-time",
+      "licensing": "$X/month or Free/Open Source",
+      "notes": "One sentence of cost context based on org size and effort"
+    },
+    "action_steps": [
+      {"phase": "Phase 1: Assessment", "duration": "2 weeks", "tasks": ["task", "task", "task"]},
+      {"phase": "Phase 2: Design & Pilot", "duration": "3-4 weeks", "tasks": ["task", "task", "task"]},
+      {"phase": "Phase 3: Build & Harden", "duration": "3-4 weeks", "tasks": ["task", "task", "task"]},
+      {"phase": "Phase 4: Rollout", "duration": "2 weeks", "tasks": ["task", "task"]}
+    ],
+    "success_metrics": ["metric", "metric", "metric"]
+  }],
   "readiness_recommendations": ["one sentence recommendation", ...]
 }
 
-Include only quick_win and plan_now tier processes. Keep it concise and actionable.`
+Guidelines:
+- industry_standards: cite FinOps Foundation capabilities (e.g. "FinOps Foundation: Cost Allocation"), CNCF practices, or cloud-provider best practices. Include 2-3 per process.
+- recommended_tools: prefer tools compatible with the client's existing stack from org context. Include 3-5 tools per process covering automation, monitoring, and integration. Prioritize tools the client already uses before suggesting new ones. Label license type accurately.
+- cost_estimate: provide realistic ranges reflecting the org size implied by org context, the effort tier (S/M/L), and the specific tools recommended. Implementation covers setup/development labor; licensing covers ongoing tool costs.
+- Include only quick_win and plan_now tier processes. Make action steps specific to the FinOps process named. Keep tasks concrete and actionable.`
 
   const result = await callGroq(prompt)
   if (isValidSummary(result)) return { ...result, source: 'api' }
@@ -87,6 +143,44 @@ function isValidSummary(obj) {
   )
 }
 
+const DEFAULT_INDUSTRY_STANDARDS = [
+  'FinOps Foundation: Cost Allocation capability',
+  'FinOps Foundation: Anomaly Detection best practice',
+  'CNCF FinOps: Cloud bill normalization and tagging governance',
+]
+
+const DEFAULT_TOOLS = [
+  { name: 'Terraform', license: 'Open Source', notes: 'Infrastructure-as-code for automating cloud resource provisioning and tagging.' },
+  { name: 'Apptio Cloudability', license: 'Commercial', notes: 'Purpose-built FinOps platform for cost visibility and chargeback workflows.' },
+  { name: 'AWS Cost Explorer / Azure Cost Management', license: 'Freemium', notes: 'Native cloud cost tooling; leverage existing entitlements before adding third-party tooling.' },
+]
+
+const DEFAULT_COST = {
+  S: { implementation: '$2,000–$8,000 one-time', licensing: 'Free–$500/month', notes: 'Low-effort automation typically leverages existing tooling with minimal net-new licensing.' },
+  M: { implementation: '$10,000–$30,000 one-time', licensing: '$500–$2,000/month', notes: 'Includes integration work and likely one commercial platform; ranges depend on headcount and existing tool coverage.' },
+  L: { implementation: '$40,000–$120,000 one-time', licensing: '$2,000–$6,000/month', notes: 'Enterprise-scale implementation with platform licensing, change management, and multi-team rollout.' },
+}
+
+const DEFAULT_STEPS = {
+  S: [
+    { phase: 'Phase 1: Discovery & Design', duration: '1 week', tasks: ['Document current process inputs, outputs, and rules', 'Identify automation trigger conditions', 'Define success metrics and acceptance criteria'] },
+    { phase: 'Phase 2: Build & Test', duration: '1-2 weeks', tasks: ['Configure tooling and build automation logic', 'Run parallel with manual process using historical data', 'Validate outputs against manual baseline'] },
+    { phase: 'Phase 3: Deploy & Monitor', duration: '1 week', tasks: ['Deploy to production with rollback plan', 'Set up alerting for failures or anomalies', 'Document process and hand off to team'] },
+  ],
+  M: [
+    { phase: 'Phase 1: Discovery & Design', duration: '1-2 weeks', tasks: ['Map current process and identify bottlenecks', 'Audit data sources and quality', 'Design automation architecture and select tooling'] },
+    { phase: 'Phase 2: Pilot Build', duration: '2-3 weeks', tasks: ['Build MVP automation for highest-volume use case', 'Run pilot in parallel with manual process', 'Gather feedback from process owners and iterate'] },
+    { phase: 'Phase 3: Hardening', duration: '1-2 weeks', tasks: ['Add error handling, logging, and alerting', 'Complete end-to-end testing and QA sign-off', 'Write runbook and operator documentation'] },
+    { phase: 'Phase 4: Rollout', duration: '1 week', tasks: ['Phased rollout to production', 'Monitor KPIs and tune thresholds', 'Decommission manual process steps'] },
+  ],
+  L: [
+    { phase: 'Phase 1: Assessment', duration: '2-3 weeks', tasks: ['Stakeholder interviews and current-state process mapping', 'Data quality audit across all source systems', 'Tool evaluation and vendor selection'] },
+    { phase: 'Phase 2: Design', duration: '2-3 weeks', tasks: ['Define target-state architecture and integration points', 'Create technical specification and get stakeholder sign-off', 'Establish governance model and change-management plan'] },
+    { phase: 'Phase 3: Build & Pilot', duration: '4-6 weeks', tasks: ['Build core automation with integrations', 'Run controlled pilot with limited scope', 'Iterate based on pilot findings'] },
+    { phase: 'Phase 4: Rollout & Optimize', duration: '3-4 weeks', tasks: ['Phased production rollout by team or region', 'Performance monitoring, tuning, and cost validation', 'Team training, documentation, and ongoing governance'] },
+  ],
+}
+
 function buildFallbackSummary(scoredResults) {
   const quickWins = scoredResults.filter((r) => r.tier === 'quick_win')
   const planNow = scoredResults.filter((r) => r.tier === 'plan_now')
@@ -97,11 +191,21 @@ function buildFallbackSummary(scoredResults) {
       process: r.label,
       rationale: `High priority score (${(r.priorityScore * 100).toFixed(0)}/100) with ${r.effort === 'S' ? 'low' : r.effort === 'M' ? 'medium' : 'high'} implementation effort.`,
       effort: r.effort,
+      industry_standards: DEFAULT_INDUSTRY_STANDARDS,
+      recommended_tools: DEFAULT_TOOLS,
+      cost_estimate: DEFAULT_COST[r.effort] ?? DEFAULT_COST.M,
+      action_steps: DEFAULT_STEPS[r.effort] ?? DEFAULT_STEPS.M,
+      success_metrics: ['Time saved per month vs. manual baseline', 'Error rate reduction vs. prior quarter', 'Process cycle time improvement'],
     })),
     plan_now: planNow.map((r) => ({
       process: r.label,
       rationale: `Solid automation candidate requiring structured implementation due to ${r.risk_level} risk level.`,
       effort: r.effort,
+      industry_standards: DEFAULT_INDUSTRY_STANDARDS,
+      recommended_tools: DEFAULT_TOOLS,
+      cost_estimate: DEFAULT_COST[r.effort] ?? DEFAULT_COST.M,
+      action_steps: DEFAULT_STEPS[r.effort] ?? DEFAULT_STEPS.M,
+      success_metrics: ['Time saved per month vs. manual baseline', 'Error rate reduction vs. prior quarter', 'Stakeholder satisfaction score'],
     })),
     readiness_recommendations: [
       'Improve data availability by centralizing cloud billing exports into a single data warehouse.',

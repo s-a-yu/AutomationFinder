@@ -12,5 +12,8 @@ dist/
 # vite cache
 .vite/
 
+# firebase
+.firebase/
+
 # OS
 .DS_Store

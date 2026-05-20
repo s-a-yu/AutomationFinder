@@ -3,6 +3,7 @@ import ProgressBar from '../components/ProgressBar'
 import ScoreMatrix from '../components/ScoreMatrix'
 import RoadmapTable from '../components/RoadmapTable'
 import SummaryCard from '../components/SummaryCard'
+import ActionPlan from '../components/ActionPlan'
 
 export default function Screen4Results() {
   const { scoredResults, summary, summaryLoading, setStep, setSelectedProcesses, setProcessAnswers, setScoredResults, setSummary, orgContext } = useApp()
@@ -65,6 +66,8 @@ export default function Screen4Results() {
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Prioritized Roadmap</h2>
             <RoadmapTable results={scoredResults} />
           </div>
+
+          <ActionPlan summary={summary} loading={summaryLoading} />
         </div>
 
         <div className="mt-8 text-center">
