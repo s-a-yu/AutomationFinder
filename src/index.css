@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+@theme {
+  --color-sage-50:  #ecf0f3;
+  --color-sage-100: #d7e0e8;
+  --color-sage-200: #bac9d6;
+  --color-sage-300: #97acbe;
+  --color-sage-400: #7089a0;
+  --color-sage-500: #526880;
+  --color-sage-600: #384959;
+  --color-sage-700: #283540;
+  --color-sage-800: #1b232b;
+  --color-sage-900: #111619;
+}

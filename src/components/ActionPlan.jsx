@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+const slug = (label) => `action-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`
 
 const TIER_STYLES = {
   quick_win: { badge: 'bg-green-100 text-green-800', dot: 'bg-green-500' },
@@ -13,17 +15,24 @@ const LICENSE_STYLES = {
   'Freemium': 'bg-sky-50 text-sky-700 border border-sky-200',
 }
 
-function ProcessPlan({ item, tier, index }) {
+function ProcessPlan({ item, tier, index, forceOpen }) {
   const [open, setOpen] = useState(index === 0)
+
+  useEffect(() => {
+    if (forceOpen) setOpen(true)
+  }, [forceOpen])
+
+  const isOpen = open
   const style = TIER_STYLES[tier] ?? TIER_STYLES.plan_now
   const steps = item.action_steps ?? []
   const metrics = item.success_metrics ?? []
   const standards = item.industry_standards ?? []
   const tools = item.recommended_tools ?? []
   const cost = item.cost_estimate ?? null
+  const value = item.value_proposition ?? null
 
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden">
+    <div id={slug(item.process)} className="border border-gray-200 rounded-xl overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -41,13 +50,30 @@ function ProcessPlan({ item, tier, index }) {
             <span className="ml-2 text-xs text-gray-400 whitespace-nowrap">{EFFORT_LABEL[item.effort]}</span>
           </div>
         </div>
-        <span className="text-gray-400 text-sm">{open ? '▲' : '▼'}</span>
+        <span className="text-gray-400 text-sm">{isOpen ? '▲' : '▼'}</span>
       </button>
 
-      {open && (
+      {isOpen && (
         <div className="border-t border-gray-100 px-5 py-5 bg-white space-y-6">
           {item.rationale && (
             <p className="text-sm text-gray-500 italic">{item.rationale}</p>
+          )}
+
+          {value && (
+            <div className="bg-sage-50 border border-sage-100 rounded-lg px-4 py-4">
+              <h4 className="text-xs font-semibold text-sage-500 uppercase tracking-wide mb-2">Value & Business Case</h4>
+              <p className="text-sm font-semibold text-sage-900 mb-3 leading-snug">{value.headline}</p>
+              {(value.benefits ?? []).length > 0 && (
+                <ul className="space-y-1.5">
+                  {value.benefits.map((b, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-sage-800">
+                      <span className="text-sage-400 flex-shrink-0 mt-0.5">→</span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
 
           {standards.length > 0 && (
@@ -56,7 +82,7 @@ function ProcessPlan({ item, tier, index }) {
               <ul className="space-y-1">
                 {standards.map((s, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                    <span className="text-indigo-400 mt-0.5 flex-shrink-0">✦</span>
+                    <span className="text-sage-400 mt-0.5 flex-shrink-0">✦</span>
                     {s}
                   </li>
                 ))}
@@ -108,12 +134,12 @@ function ProcessPlan({ item, tier, index }) {
                 <div className="space-y-5">
                   {steps.map((step, i) => (
                     <div key={i} className="relative pl-8">
-                      <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                      <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-sage-600 flex items-center justify-center text-white text-xs font-bold">
                         {i + 1}
                       </div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm font-semibold text-gray-800">{step.phase}</span>
-                        <span className="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">{step.duration}</span>
+                        <span className="text-xs text-sage-600 bg-sage-50 px-2 py-0.5 rounded-full">{step.duration}</span>
                       </div>
                       <ul className="space-y-1">
                         {(step.tasks ?? []).map((task, j) => (
@@ -146,7 +172,7 @@ function ProcessPlan({ item, tier, index }) {
   )
 }
 
-export default function ActionPlan({ summary, loading }) {
+export default function ActionPlan({ summary, loading, targetProcessLabel }) {
   if (loading) {
     return (
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm animate-pulse space-y-3">
@@ -176,7 +202,7 @@ export default function ActionPlan({ summary, loading }) {
       </div>
       <div className="space-y-3">
         {allItems.map(({ item, tier }, i) => (
-          <ProcessPlan key={item.process} item={item} tier={tier} index={i} />
+          <ProcessPlan key={item.process} item={item} tier={tier} index={i} forceOpen={item.process === targetProcessLabel} />
         ))}
       </div>
     </div>

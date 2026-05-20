@@ -56,77 +56,125 @@ async function callGroq(prompt, timeoutMs = 20000, retries = 2) {
 }
 
 export async function generateSummary(scoredResults, orgContext) {
-  const prompt = `You are a FinOps consulting expert. Based on the following assessment data, produce a JSON executive summary.
+  const prompt = `You are a senior FinOps consultant writing a delivery plan for a paying client. Based on the assessment data below, produce a JSON report. Every field must be specific to this client — generic filler is not acceptable.
 
-Org context (includes existing tools, cloud providers, and platforms the client already uses):
+Client org context (cloud platform, existing tools, team size, industry, risk tolerance):
 ${JSON.stringify(orgContext)}
 
-Scored processes (sorted by priority): ${JSON.stringify(scoredResults)}
+Scored FinOps processes (sorted by priority, includes effort and risk level):
+${JSON.stringify(scoredResults)}
 
-Return ONLY valid JSON with this exact shape:
+Return ONLY valid JSON matching this exact shape:
 {
-  "executive_summary": "2-3 sentence paragraph",
+  "executive_summary": "2-3 sentence paragraph referencing the client's specific cloud platform and top-priority process",
   "quick_wins": [{
-    "process": "label",
-    "rationale": "one sentence",
+    "process": "exact process label from scored list",
+    "rationale": "one sentence citing the specific scores and why this is a quick win for this client",
     "effort": "S|M|L",
+    "value_proposition": {
+      "headline": "One sentence — the core business case for automating this specific process for this client",
+      "benefits": [
+        "Concrete, specific benefit quantifying time or cost impact where possible (e.g. 'Eliminates ~6 hrs/month of manual tagging audits across 3 cloud accounts')",
+        "A second specific improvement this automation delivers over the current manual approach",
+        "A third benefit — risk reduction, visibility gain, or downstream process improvement"
+      ]
+    },
     "industry_standards": [
-      "Relevant FinOps Foundation framework capability or industry best practice for this specific process"
+      "FinOps Foundation capability name or CNCF/cloud-provider best practice — specific to this process"
     ],
     "recommended_tools": [
       {
-        "name": "Tool or platform name",
+        "name": "Specific tool name",
         "license": "Open Source|Commercial|Freemium",
-        "notes": "One sentence on why it fits this process and the client's stack"
+        "notes": "One sentence on fit: why this tool for this process given the client's existing stack"
       }
     ],
     "cost_estimate": {
       "implementation": "$X,000–$X,000 one-time",
       "licensing": "$X/month or Free/Open Source",
-      "notes": "One sentence of cost context based on org size and effort"
+      "notes": "State which recommended tools are already in the client's stack (zero net-new cost) and which are new — e.g. 'AWS Cost Explorer already licensed; Datadog is net-new at $X/month'"
     },
     "action_steps": [
-      {"phase": "Phase 1: Discovery & Design", "duration": "1-2 weeks", "tasks": ["task", "task", "task"]},
-      {"phase": "Phase 2: Build & Test", "duration": "2-3 weeks", "tasks": ["task", "task", "task"]},
-      {"phase": "Phase 3: Deploy & Monitor", "duration": "1 week", "tasks": ["task", "task"]}
+      {
+        "phase": "Short descriptive name for what this phase actually does for THIS process — not a generic label like 'Phase 1: Discovery'",
+        "duration": "X–Y weeks",
+        "tasks": [
+          "Concrete step naming the specific tool from recommended_tools and the exact operation to perform — not generic",
+          "Another step tailored to the client's cloud platform and this specific FinOps process",
+          "A step that references an industry standard or governance requirement relevant to this client"
+        ]
+      }
     ],
-    "success_metrics": ["metric", "metric"]
+    "success_metrics": ["Quantified metric tied to this specific process, not a generic KPI"]
   }],
   "plan_now": [{
-    "process": "label",
-    "rationale": "one sentence",
+    "process": "exact process label from scored list",
+    "rationale": "one sentence citing the specific scores and why this requires a structured plan for this client",
     "effort": "S|M|L",
+    "value_proposition": {
+      "headline": "One sentence — the core business case for automating this specific process for this client",
+      "benefits": [
+        "Concrete, specific benefit quantifying time or cost impact where possible",
+        "A second specific improvement this automation delivers over the current manual approach",
+        "A third benefit — risk reduction, visibility gain, or downstream process improvement"
+      ]
+    },
     "industry_standards": [
-      "Relevant FinOps Foundation framework capability or industry best practice for this specific process"
+      "FinOps Foundation capability name or CNCF/cloud-provider best practice — specific to this process"
     ],
     "recommended_tools": [
       {
-        "name": "Tool or platform name",
+        "name": "Specific tool name",
         "license": "Open Source|Commercial|Freemium",
-        "notes": "One sentence on why it fits this process and the client's stack"
+        "notes": "One sentence on fit: why this tool for this process given the client's existing stack"
       }
     ],
     "cost_estimate": {
       "implementation": "$X,000–$X,000 one-time",
       "licensing": "$X/month or Free/Open Source",
-      "notes": "One sentence of cost context based on org size and effort"
+      "notes": "State which recommended tools are already in the client's stack (zero net-new cost) and which are new — e.g. 'AWS Cost Explorer already licensed; Datadog is net-new at $X/month'"
     },
     "action_steps": [
-      {"phase": "Phase 1: Assessment", "duration": "2 weeks", "tasks": ["task", "task", "task"]},
-      {"phase": "Phase 2: Design & Pilot", "duration": "3-4 weeks", "tasks": ["task", "task", "task"]},
-      {"phase": "Phase 3: Build & Harden", "duration": "3-4 weeks", "tasks": ["task", "task", "task"]},
-      {"phase": "Phase 4: Rollout", "duration": "2 weeks", "tasks": ["task", "task"]}
+      {
+        "phase": "Short descriptive name for what this phase actually does for THIS process — not a generic label like 'Phase 1: Assessment'",
+        "duration": "X–Y weeks",
+        "tasks": [
+          "Concrete step naming the specific tool from recommended_tools and the exact operation to perform — not generic",
+          "Another step tailored to the client's cloud platform and this specific FinOps process",
+          "A step that references an industry standard or governance requirement relevant to this client"
+        ]
+      }
     ],
-    "success_metrics": ["metric", "metric", "metric"]
+    "success_metrics": ["Quantified metric tied to this specific process, not a generic KPI"]
   }],
-  "readiness_recommendations": ["one sentence recommendation", ...]
+  "readiness_recommendations": ["Specific recommendation referencing the client's actual readiness gaps"]
 }
 
-Guidelines:
-- industry_standards: cite FinOps Foundation capabilities (e.g. "FinOps Foundation: Cost Allocation"), CNCF practices, or cloud-provider best practices. Include 2-3 per process.
-- recommended_tools: prefer tools compatible with the client's existing stack from org context. Include 3-5 tools per process covering automation, monitoring, and integration. Prioritize tools the client already uses before suggesting new ones. Label license type accurately.
-- cost_estimate: provide realistic ranges reflecting the org size implied by org context, the effort tier (S/M/L), and the specific tools recommended. Implementation covers setup/development labor; licensing covers ongoing tool costs.
-- Include only quick_win and plan_now tier processes. Make action steps specific to the FinOps process named. Keep tasks concrete and actionable.`
+CRITICAL rules for action_steps — read carefully before writing any tasks:
+
+1. Every task must name a specific tool from that process's recommended_tools list. Never write a task without a tool name.
+   BAD: "Configure tooling and build automation logic."
+   GOOD: "In Terraform, create a data.aws_cost_explorer resource querying the last 90 days of spend grouped by the team and cost-center tags — this becomes the baseline for anomaly thresholds."
+
+2. Phase names must describe the actual work for this specific FinOps process. Do NOT use generic names.
+   BAD: "Phase 1: Discovery & Design", "Phase 2: Build & Test"
+   GOOD (for Spend Anomaly Detection): "Baseline & Threshold Design", "Alert Pipeline Build", "Triage Workflow & Runbook"
+   GOOD (for Cost Allocation & Tagging): "Tag Taxonomy Audit", "Enforcement Rule Deployment", "Allocation Report Automation"
+
+3. Tasks must be tailored to the client's cloud platform from org context. An AWS client and an Azure client should get completely different tasks for the same process.
+
+4. Tasks must differ between processes. Anomaly Detection tasks must look nothing like Rightsizing tasks.
+
+5. Reference the org's industry, size, or risk tolerance where it changes what the practitioner should do (e.g. a regulated industry needs audit-trail steps; a small team needs steps that don't require a dedicated FinOps platform).
+
+6. Each task should be something a practitioner can actually execute — a specific console action, a script, a meeting with a named output, a configuration change in a named tool.
+
+Additional field guidelines:
+- value_proposition: The headline is the one-line business case — why this specific process, for this specific client, right now. Benefits must be process-specific and org-specific. Quantify wherever the org context gives you signal (e.g. if the org runs daily cost reviews on AWS across multiple accounts, estimate the manual hours). Do NOT write generic benefits like "saves time" or "improves accuracy" — say exactly what changes, how much, and for whom. The third benefit should address a downstream or strategic impact (e.g. "gives finance teams real-time chargeback data, removing the 2-week delay in monthly showback reports").
+- industry_standards: cite specific FinOps Foundation capability names, CNCF OpenCost practices, or cloud-provider best practice docs. Include 2-3 per process.
+- recommended_tools: prefer tools the client already uses (visible in org context) before suggesting new ones. Include 3-5 tools. Label license type accurately.
+- cost_estimate: ONLY count net-new costs. Cross-reference recommended_tools against the client's existing stack in org context. Any tool the client already uses has $0 net-new licensing cost — do not include it in the licensing figure. Implementation covers labor/setup only. The notes field must explicitly state which tools are already covered (e.g. "AWS Cost Explorer and Terraform already in existing contracts — net-new licensing is $0; only labor cost applies") and which are new. If all recommended tools are already in the client's stack, licensing should be "Free / already licensed".
+- Include only quick_win and plan_now processes. Number of phases should match the effort tier: S=3 phases, M=3-4 phases, L=4 phases.`
 
   const result = await callGroq(prompt)
   if (isValidSummary(result)) return { ...result, source: 'api' }
@@ -191,6 +239,14 @@ function buildFallbackSummary(scoredResults) {
       process: r.label,
       rationale: `High priority score (${(r.priorityScore * 100).toFixed(0)}/100) with ${r.effort === 'S' ? 'low' : r.effort === 'M' ? 'medium' : 'high'} implementation effort.`,
       effort: r.effort,
+      value_proposition: {
+        headline: `Automating ${r.label} reduces manual overhead and improves consistency across your cloud cost operations.`,
+        benefits: [
+          'Eliminates repetitive manual work, freeing engineering time for higher-value analysis',
+          'Reduces human error and improves data consistency across billing cycles',
+          'Provides faster feedback loops, enabling the team to act on cost signals in near real-time',
+        ],
+      },
       industry_standards: DEFAULT_INDUSTRY_STANDARDS,
       recommended_tools: DEFAULT_TOOLS,
       cost_estimate: DEFAULT_COST[r.effort] ?? DEFAULT_COST.M,
@@ -201,6 +257,14 @@ function buildFallbackSummary(scoredResults) {
       process: r.label,
       rationale: `Solid automation candidate requiring structured implementation due to ${r.risk_level} risk level.`,
       effort: r.effort,
+      value_proposition: {
+        headline: `Automating ${r.label} strengthens cost governance and reduces the operational burden on your FinOps team.`,
+        benefits: [
+          'Removes manual bottlenecks that delay cost visibility and reporting',
+          'Standardizes the process across teams, reducing variance and audit risk',
+          'Scales with cloud footprint growth without requiring proportional headcount increases',
+        ],
+      },
       industry_standards: DEFAULT_INDUSTRY_STANDARDS,
       recommended_tools: DEFAULT_TOOLS,
       cost_estimate: DEFAULT_COST[r.effort] ?? DEFAULT_COST.M,

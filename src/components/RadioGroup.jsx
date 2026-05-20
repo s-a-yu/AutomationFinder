@@ -11,9 +11,9 @@ export default function RadioGroup({ name, options, value, onChange, muted = fal
             className={`px-4 py-2 rounded-full text-sm font-medium border transition-all
               ${selected
                 ? muted
-                  ? 'bg-indigo-100 border-indigo-300 text-indigo-700'
-                  : 'bg-indigo-600 border-indigo-600 text-white'
-                : 'bg-white border-gray-300 text-gray-600 hover:border-indigo-400 hover:text-indigo-600'
+                  ? 'bg-sage-100 border-sage-300 text-sage-700'
+                  : 'bg-sage-600 border-sage-600 text-white'
+                : 'bg-white border-gray-300 text-gray-600 hover:border-sage-400 hover:text-sage-600'
               }
               ${muted && !selected ? 'opacity-60' : ''}
             `}

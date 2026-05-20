@@ -64,36 +64,43 @@ export default function Screen1Context() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-8 py-10">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-white flex">
+      {/* Sidebar */}
+      <aside className="w-56 shrink-0 border-r border-gray-100 px-6 py-10 sticky top-0 h-screen overflow-y-auto">
         <ProgressBar step={1} />
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Organizational Context</h1>
-          <p className="text-gray-500 mt-2">Help us understand your environment so we can tailor recommendations.</p>
+      </aside>
+
+      {/* Main */}
+      <main className="flex-1 px-12 py-10">
+        <div className="max-w-xl mx-auto">
+          <h1 className="text-3xl font-bold text-gray-900 mb-1">Organizational Context</h1>
+          <p className="text-sm text-gray-400 mb-10">Help us understand your environment so we can tailor recommendations.</p>
+
+          <div className="space-y-8">
+            {QUESTIONS.map((q) => (
+              <div key={q.key}>
+                <p className="text-sm font-semibold text-gray-700 mb-3">{q.label}</p>
+                <RadioGroup
+                  name={q.key}
+                  options={q.options}
+                  value={answers[q.key]}
+                  onChange={(val) => setAnswers((prev) => ({ ...prev, [q.key]: val }))}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 pt-8 border-t border-gray-100 flex justify-end">
+            <button
+              onClick={handleNext}
+              disabled={!allAnswered}
+              className="px-6 py-3 bg-sage-600 text-white rounded-xl font-semibold text-sm hover:bg-sage-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Next: Process Survey →
+            </button>
+          </div>
         </div>
-        <div className="space-y-8 bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-          {QUESTIONS.map((q) => (
-            <div key={q.key}>
-              <p className="text-sm font-semibold text-gray-700 mb-3">{q.label}</p>
-              <RadioGroup
-                name={q.key}
-                options={q.options}
-                value={answers[q.key]}
-                onChange={(val) => setAnswers((prev) => ({ ...prev, [q.key]: val }))}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={handleNext}
-            disabled={!allAnswered}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            Next: Process Survey →
-          </button>
-        </div>
-      </div>
+      </main>
     </div>
   )
 }

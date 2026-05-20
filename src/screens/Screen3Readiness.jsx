@@ -48,6 +48,7 @@ export default function Screen3Readiness() {
     readinessAnswers, updateReadinessAnswer,
     setStep, selectedProcesses, processAnswers, orgContext,
     setScoredResults, setSummary, setSummaryLoading,
+    connectionSource,
   } = useApp()
 
   const allAnswered = QUESTIONS.every((q) => readinessAnswers[q.key] != null)
@@ -63,37 +64,54 @@ export default function Screen3Readiness() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-8 py-10">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-white flex">
+      {/* Sidebar */}
+      <aside className="w-56 shrink-0 border-r border-gray-100 px-6 py-10 sticky top-0 h-screen overflow-y-auto">
         <ProgressBar step={3} />
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Readiness Check</h1>
-          <p className="text-gray-500 mt-2">Four questions that determine your organization's automation readiness across all selected processes.</p>
-        </div>
-        <div className="space-y-8 bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-          {QUESTIONS.map((q) => (
-            <div key={q.key}>
-              <p className="text-sm font-semibold text-gray-700 mb-3">{q.label}</p>
-              <RadioGroup
-                name={q.key}
-                options={q.options}
-                value={readinessAnswers[q.key]}
-                onChange={(val) => updateReadinessAnswer(q.key, val)}
-              />
+      </aside>
+
+      {/* Main */}
+      <main className="flex-1 px-12 py-10">
+        <div className="max-w-xl mx-auto">
+          <h1 className="text-3xl font-bold text-gray-900 mb-1">Readiness Check</h1>
+          <p className="text-sm text-gray-400 mb-8">Four questions that determine your organization's automation readiness across all selected processes.</p>
+
+          {connectionSource && (
+            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 mb-6 text-sm text-emerald-700">
+              <span className="flex-shrink-0">✓</span>
+              <span>
+                Readiness signals pre-filled from your <strong>{connectionSource.provider}</strong> environment scan.
+                You can adjust any answer below.
+              </span>
             </div>
-          ))}
+          )}
+
+          <div className="space-y-8">
+            {QUESTIONS.map((q) => (
+              <div key={q.key}>
+                <p className="text-sm font-semibold text-gray-700 mb-3">{q.label}</p>
+                <RadioGroup
+                  name={q.key}
+                  options={q.options}
+                  value={readinessAnswers[q.key]}
+                  onChange={(val) => updateReadinessAnswer(q.key, val)}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 pt-8 border-t border-gray-100 flex items-center justify-between">
+            <button onClick={() => setStep(2)} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">← Back</button>
+            <button
+              onClick={handleNext}
+              disabled={!allAnswered}
+              className="px-6 py-3 bg-sage-600 text-white rounded-xl font-semibold text-sm hover:bg-sage-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              See Results →
+            </button>
+          </div>
         </div>
-        <div className="mt-6 flex items-center justify-between">
-          <button onClick={() => setStep(2)} className="text-sm text-gray-500 hover:text-gray-700">← Back</button>
-          <button
-            onClick={handleNext}
-            disabled={!allAnswered}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            See Results →
-          </button>
-        </div>
-      </div>
+      </main>
     </div>
   )
 }

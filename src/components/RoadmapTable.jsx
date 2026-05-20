@@ -54,7 +54,7 @@ export default function RoadmapTable({ results }) {
                       <div className="flex items-center gap-2">
                         <div className="w-16 h-1.5 bg-gray-200 rounded-full">
                           <div
-                            className="h-1.5 bg-indigo-500 rounded-full"
+                            className="h-1.5 bg-sage-600 rounded-full"
                             style={{ width: `${r.priorityScore * 100}%` }}
                           />
                         </div>

@@ -24,10 +24,10 @@ export default function ProcessCard({ process, checked, onCheck, answers, onAnsw
   }
 
   return (
-    <div className={`border rounded-xl transition-all ${checked ? 'border-indigo-400 bg-indigo-50/40' : 'border-gray-200 bg-white'}`}>
+    <div className={`border rounded-xl transition-all ${checked ? 'border-sage-400 bg-sage-50/40' : 'border-gray-200 bg-white'}`}>
       <div className="flex items-start gap-3 p-4 cursor-pointer" onClick={handleCheck}>
         <div className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors
-          ${checked ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300'}`}>
+          ${checked ? 'bg-sage-600 border-sage-600' : 'border-gray-300'}`}>
           {checked && <span className="text-white text-xs font-bold">✓</span>}
         </div>
         <div className="flex-1 min-w-0">
@@ -62,7 +62,7 @@ export default function ProcessCard({ process, checked, onCheck, answers, onAnsw
       </div>
 
       {checked && open && (
-        <div className="border-t border-indigo-100 px-4 pb-4 pt-3 space-y-4">
+        <div className="border-t border-sage-100 px-4 pb-4 pt-3 space-y-4">
           {DIMENSIONS.map((dim) => {
             const isAiFilled = prefilled?.includes(dim.key)
             const isUserConfirmed = userEdited.includes(dim.key)
